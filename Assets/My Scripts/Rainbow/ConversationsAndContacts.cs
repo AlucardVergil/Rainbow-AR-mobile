@@ -338,6 +338,7 @@ public class ConversationsAndContacts : MonoBehaviour
 
                     contactGameobject.GetComponent<Button>().onClick.AddListener(() => {
 
+                        
                         // Used siblingIndex instead of i because in addlistener it used the last assigned value of i in everything
                         Conversation conversationWithContact = OpenConversationWithContact(contactList[contactGameobject.transform.GetSiblingIndex()]);
                         //conversationContentArea.text = conversationWithContact.LastMessageText;
@@ -378,7 +379,7 @@ public class ConversationsAndContacts : MonoBehaviour
                             alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()] = true;
                             FetchLastMessagesReceivedInConversation(conversationWithContact);
                         }
-                            
+                        GetComponent<MenuManager>().OpenCloseChatPanels(1);
                     });
 
 
@@ -388,7 +389,7 @@ public class ConversationsAndContacts : MonoBehaviour
 
 
                     // Display the contact's avatar image
-                    avatarImage[i] = contactGameobject.transform.Find("Frontplate/AnimatedContent/Icon/UIButtonSpriteIcon").GetComponent<Image>();
+                    avatarImage[i] = contactGameobject.GetComponent<Image>();
 
                     tempContacts[i] = contactList[i];
 

@@ -15,10 +15,10 @@ public class BubbleManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GetAllBubbles();
-        }
+        //if (Input.GetKeyDown(KeyCode.F))
+        //{
+        //    GetAllBubbles();
+        //}
     }
 
 
