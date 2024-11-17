@@ -27,7 +27,7 @@ public class ConversationsAndContacts : MonoBehaviour
     public Transform conversationScrollViewContent;
 
 
-    public InputField messageInputField;
+    public TMP_InputField messageInputField;
     private Conversation currentSelectedConversation;
 
     private bool initializationPerformedFlag = false;
