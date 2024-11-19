@@ -208,6 +208,8 @@ public class RainbowManager : MonoBehaviour
         //the FetchCurrentProfile() from the event handler but only called the coroutine from the Update() it worked correctly.
         if (initializationPerformedFlag)
         {
+            GetComponent<MenuManager>().OpenCloseMenuPanel(1);
+
             StartCoroutine(HandleAvatarData(avatarData));
             initializationPerformedFlag = false;
 

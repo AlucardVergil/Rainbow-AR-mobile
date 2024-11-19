@@ -320,8 +320,11 @@ public class ConversationsAndContacts : MonoBehaviour
                     layout.childForceExpandWidth = true;
                     layout.childControlWidth = true;
 
-                    
-                    
+                    layout.GetComponent<RectTransform>().sizeDelta = new Vector2(938, layout.GetComponent<RectTransform>().sizeDelta.y);
+
+
+
+
                 }
 
 
@@ -338,7 +341,8 @@ public class ConversationsAndContacts : MonoBehaviour
 
                     contactGameobject.GetComponent<Button>().onClick.AddListener(() => {
 
-                        
+                        GetComponent<MenuManager>().OpenCloseChatPanels(1);
+
                         // Used siblingIndex instead of i because in addlistener it used the last assigned value of i in everything
                         Conversation conversationWithContact = OpenConversationWithContact(contactList[contactGameobject.transform.GetSiblingIndex()]);
                         //conversationContentArea.text = conversationWithContact.LastMessageText;

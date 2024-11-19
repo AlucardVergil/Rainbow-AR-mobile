@@ -16,6 +16,11 @@ public class MenuManager : MonoBehaviour
         {
             panels[i].SetActive(false);
         }
+
+        for (int i = 1; i < chatPanels.Length; i++)
+        {
+            chatPanels[i].SetActive(false);
+        }
     }
 
 
