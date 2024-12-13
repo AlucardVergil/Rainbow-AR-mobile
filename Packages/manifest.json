@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.al-enterprise.rainbowsdk": "file:C:/Users/AlucardVergil/OneDrive/Έγγραφα/AgrivisionAR/rainbow-unity-package-master",
+    "com.al-enterprise.rainbowsdk": "file:C:/Users/user/UnityProjects/rainbow-unity-package-master",
     "com.unity.ide.visualstudio": "2.0.22",
     "com.unity.ide.vscode": "1.2.5",
     "com.unity.inputsystem": "1.8.2",

@@ -49,14 +49,14 @@ public class ConferenceManager : MonoBehaviour
     }
 
     // Start Personal Conference (PSTN)
-    public void StartPersonalConference()
+    public void StartPersonalConference(string bubbleId)
     {
-        rbConferences.ConferenceStart(callbackStart =>
+        rbConferences.ConferenceStart(bubbleId, callbackStart =>
         {
             if (callbackStart.Result.Success)
             {
                 Debug.Log("PSTN Conference started successfully.");
-                JoinPersonalConference();
+                JoinPersonalConference(bubbleId);
             }
             else
             {
@@ -100,57 +100,57 @@ public class ConferenceManager : MonoBehaviour
     }
 
     // Fetch PSTN Conference Phone Numbers
-    public void GetPersonalConferencePhoneNumbers()
-    {
-        rbConferences.PersonalConferenceGetPhoneNumbers(callback =>
-        {
-            if (callback.Result.Success)
-            {
-                PersonalConferencePhoneNumbers phoneNumbers = callback.Data;
-                Debug.Log("Phone numbers to join the PSTN Conference: " + phoneNumbers);
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
-        });
-    }
+    //public void GetPersonalConferencePhoneNumbers()
+    //{
+    //    rbConferences.PersonalConferenceGetPhoneNumbers(callback =>
+    //    {
+    //        if (callback.Result.Success)
+    //        {
+    //            PersonalConferencePhoneNumbers phoneNumbers = callback.Data;
+    //            Debug.Log("Phone numbers to join the PSTN Conference: " + phoneNumbers);
+    //        }
+    //        else
+    //        {
+    //            HandleError(callback.Result);
+    //        }
+    //    });
+    //}
 
-    // Fetch Passcodes for the Conference
-    public void GetConferencePassCodes()
-    {
-        rbConferences.PersonalConferenceGetPassCodes(callback =>
-        {
-            if (callback.Result.Success)
-            {
-                ConferencePassCodes passCodes = callback.Data;
-                string moderatorCode = passCodes.ModeratorPassCode;
-                string participantCode = passCodes.ParticipantPassCode;
-                Debug.Log($"Moderator passcode: {moderatorCode}, Participant passcode: {participantCode}");
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
-        });
-    }
+    //// Fetch Passcodes for the Conference
+    //public void GetConferencePassCodes()
+    //{
+    //    rbConferences.PersonalConferenceGetPassCodes(callback =>
+    //    {
+    //        if (callback.Result.Success)
+    //        {
+    //            ConferencePassCodes passCodes = callback.Data;
+    //            string moderatorCode = passCodes.ModeratorPassCode;
+    //            string participantCode = passCodes.ParticipantPassCode;
+    //            Debug.Log($"Moderator passcode: {moderatorCode}, Participant passcode: {participantCode}");
+    //        }
+    //        else
+    //        {
+    //            HandleError(callback.Result);
+    //        }
+    //    });
+    //}
 
-    // Fetch the Public URL for the Conference
-    public void GetConferencePublicUrl()
-    {
-        rbConferences.PersonalConferenceGetPublicUrl(callback =>
-        {
-            if (callback.Result.Success)
-            {
-                string url = callback.Data;
-                Debug.Log("Public URL for the conference: " + url);
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
-        });
-    }
+    //// Fetch the Public URL for the Conference
+    //public void GetConferencePublicUrl()
+    //{
+    //    rbConferences.PersonalConferenceGetPublicUrl(callback =>
+    //    {
+    //        if (callback.Result.Success)
+    //        {
+    //            string url = callback.Data;
+    //            Debug.Log("Public URL for the conference: " + url);
+    //        }
+    //        else
+    //        {
+    //            HandleError(callback.Result);
+    //        }
+    //    });
+    //}
 
     // Lock or Unlock the Conference
     public void LockOrUnlockConference(string bubbleId, bool lockConference)
@@ -187,9 +187,9 @@ public class ConferenceManager : MonoBehaviour
     }
 
     // Stop the conference (end the session)
-    public void StopConference()
+    public void StopConference(string bubbleId)
     {
-        rbConferences.ConferenceStop(callback =>
+        rbConferences.ConferenceStop(bubbleId, callback =>
         {
             if (callback.Result.Success)
             {

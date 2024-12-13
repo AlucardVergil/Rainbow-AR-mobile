@@ -12,6 +12,9 @@ public class BubbleManager : MonoBehaviour
     private Contact myContact;
     private Bubbles bubbles;
 
+    public GameObject bubblePrefab;
+    public Transform bubblesScrollViewContent;
+
 
     private void Update()
     {

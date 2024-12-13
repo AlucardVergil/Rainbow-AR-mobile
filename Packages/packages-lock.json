@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.al-enterprise.rainbowsdk": {
-      "version": "file:C:/Users/AlucardVergil/OneDrive/Έγγραφα/AgrivisionAR/rainbow-unity-package-master",
+      "version": "file:C:/Users/user/UnityProjects/rainbow-unity-package-master",
       "depth": 0,
       "source": "local",
       "dependencies": {
