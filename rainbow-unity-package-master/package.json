@@ -1,0 +1,36 @@
+{
+    "name": "com.al-enterprise.rainbowsdk",
+    "version": "2.6.33",
+    "displayName": "Rainbow SDK Unity WebRTC",
+    "description": "Provides rainbow connectivity to Unity with WebRTC.",
+    "documentationUrl": "https://developers.openrainbow.com/doc/sdk/csharp/core/lts/guides/001_getting_started",
+    "changelogUrl": "https://developers.openrainbow.com/doc/sdk/csharp/core/lts/guides/020_what_is_new",
+    "licensesUrl": "https://developers.openrainbow.com/doc/sdk/csharp/core/lts/guides/150_legals",
+    "type": "library",
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.webrtc": "3.0.0-pre.7"
+    },
+    "samples": [
+        {
+            "displayName": "Common",
+            "description": "Common files need by other samples.",
+            "path": "Samples~/Common"
+        },
+        {
+            "displayName": "Basic Rainbow Sample",
+            "description": "Shows how to connect with media to a conference or a contact.",
+            "path": "Samples~/BasicRainbowSample"
+        },
+        {
+            "displayName": "Mini Rainbow Client",
+            "description": "Rainbow client look-alike. Has extra dependencies on https://github.com/kirevdokimov/Unity-UI-Rounded-Corners.git and com.unity.vectorgraphics.",
+            "path": "Samples~/MiniRainbowClient"
+        }
+    ],
+    "author": {
+        "name": "Alcatel Lucent Enterprise",
+        "email": "philippe.torrelli@al-enterprise.com",
+        "url": "https://developers.openrainbow.com/doc/sdk/csharp/core/lts/guides/001_getting_started"
+    }
+}
