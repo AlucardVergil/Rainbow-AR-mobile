@@ -10,7 +10,10 @@ public class ConferenceManager : MonoBehaviour
     private Conferences rbConferences;
     private string conferenceId;
 
-    void Start()
+
+
+
+    public void InitializeConferenceManager()
     {
         // Initialize Rainbow Application
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
@@ -69,9 +72,9 @@ public class ConferenceManager : MonoBehaviour
     private void JoinPersonalConference(string bubbleId)
     {
         bool asModerator = true;           // User wants to join as moderator
-        bool muted = true;                 // User wants to join muted
-        string phoneNumber = "+33612345678";  // Use your phone number here
-        string country = "FRA";               // Country code
+        bool muted = false;                 // User wants to join muted
+        string phoneNumber = "+306972186490";  // Use your phone number here
+        string country = "GR";               // Country code
 
         rbConferences.ConferenceJoin(bubbleId, muted, phoneNumber, country, callback =>
         {

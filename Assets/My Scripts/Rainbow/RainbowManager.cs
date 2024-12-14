@@ -216,6 +216,7 @@ public class RainbowManager : MonoBehaviour
 
             GetComponent<ConversationsAndContacts>().InitializeConversationsAndContacts();
             GetComponent<BubbleManager>().InitializeBubblesManager();
+            GetComponent<ConferenceManager>().InitializeConferenceManager();
         }
     }
 
