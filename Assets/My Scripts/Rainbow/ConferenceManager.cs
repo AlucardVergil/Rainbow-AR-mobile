@@ -69,24 +69,31 @@ public class ConferenceManager : MonoBehaviour
     }
 
     // Join a Personal Conference
-    private void JoinPersonalConference(string bubbleId)
+    private async void JoinPersonalConference(string bubbleId)
     {
         bool asModerator = true;           // User wants to join as moderator
         bool muted = false;                 // User wants to join muted
         string phoneNumber = "+306972186490";  // Use your phone number here
-        string country = "GR";               // Country code
+        string country = "GRC";               // Country code
 
-        rbConferences.ConferenceJoin(bubbleId, muted, phoneNumber, country, callback =>
+        Debug.Log("Bubble id 2 = " + bubbleId);
+
+        await UnityMainThreadDispatcher.Instance().EnqueueAsync(() => 
         {
-            if (callback.Result.Success)
+            rbConferences.ConferenceJoin(bubbleId, muted, phoneNumber, country, callback =>
             {
-                Debug.Log("User joined the Personal Conference.");
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
+                if (callback.Result.Success)
+                {
+                    Debug.Log("User joined the Personal Conference.");
+                }
+                else
+                {
+                    HandleError(callback.Result);
+                }
+            });
         });
+
+        
     }
 
     // Handle Errors (Incorrect use or exceptions)
@@ -94,7 +101,7 @@ public class ConferenceManager : MonoBehaviour
     {
         if (result.Type == SdkError.SdkErrorType.IncorrectUse)
         {
-            Debug.LogError("Incorrect parameters: " + result.IncorrectUseError.ErrorMsg);
+            Debug.Log("Incorrect parameters: " + result.IncorrectUseError.ErrorMsg);
         }
         else
         {

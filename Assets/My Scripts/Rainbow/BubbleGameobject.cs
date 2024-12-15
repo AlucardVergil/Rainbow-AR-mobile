@@ -26,6 +26,7 @@ public class BubbleGameobject : MonoBehaviour
 
     public void StartConference()
     {
+        Debug.Log("Bubble id = " + bubble.Id);
         conferenceManager.StartPersonalConference(bubble.Id);
     }
 
