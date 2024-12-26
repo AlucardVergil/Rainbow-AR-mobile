@@ -76,8 +76,14 @@ namespace Cortex
             }
         }
 
+        // Vagelis
+        GameObject bubblesGameobject;
+        GameObject bubbleDetailsGameobject;
+
+
         void Awake()
-        {
+        {            
+
             if (TextObject == null)
             {
                 TextObject = GameObjectUtils.FindGameObjectByName(transform, "BubbleName", true).GetComponent<TMP_Text>();
@@ -95,10 +101,22 @@ namespace Cortex
             Active = false;
         }
 
+        // Vagelis
+        private void Start()
+        {
+            bubblesGameobject = GameObject.FindGameObjectWithTag("Bubbles");
+        }
+
+
+
         public void OnPointerClick(PointerEventData eventData)
         {
             OnClick?.Invoke(this);
             eventData.Use();
+
+
+            // Vagelis
+            bubblesGameobject.SetActive(false);
         }
     }
 } // end namespace Cortex

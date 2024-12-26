@@ -34,8 +34,23 @@ namespace Cortex
         private readonly Dictionary<string, BubbleListEntry> bubbleEntries = new();
         private readonly Dictionary<string, ResetCancellationToken> bubbleEntryTokens = new();
 
+        // vagelis
+        public GameObject bubblesGameobject;
+
+
+
+
         override protected void OnStartOrEnable()
         {
+            // vagelis
+
+
+            bubblesGameobject.SetActive(true);
+
+
+
+            // end vagelis
+
             if (AvatarLoader == null)
             {
                 AvatarLoader = FindFirstObjectByType<RainbowAvatarLoader>();
