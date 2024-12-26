@@ -1,0 +1,16 @@
+{
+	"name": "SimpleDataChannelRainbow",
+	"references": [
+    "Unity.WebRTC",
+    "Rainbow.WebRTC.Unity"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
