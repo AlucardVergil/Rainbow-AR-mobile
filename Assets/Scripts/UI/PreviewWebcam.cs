@@ -39,6 +39,10 @@ namespace Cortex
 
         #endregion // ui
 
+        public TMP_Text debugText;
+
+
+
         void Awake()
         {
             if (buttonShare == null)
@@ -76,13 +80,15 @@ namespace Cortex
             StopUI();
         }
 
-        private void OnClickShare()
+        private void OnClickShare() // vagelis to check
         {
             string name = dropdownWebcams.options[dropdownWebcams.value].text;
             WebCamDevice[] devices = WebCamTexture.devices;
 
+            debugText.text = "";
             foreach (var d in devices)
             {
+                debugText.text += d.name + "\n";
                 if (d.name == name)
                 {
                     RemoveCurrentWebcamTexture();
