@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Cortex;
 
-public class ConversationsAndContacts : MonoBehaviour
+public class ConversationsAndContactsBackup : MonoBehaviour
 {
     private Rainbow.Application rbApplication;
     private InstantMessaging instantMessaging;

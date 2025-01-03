@@ -330,6 +330,38 @@ namespace Cortex
             }
         }
 
+
+        // Vagelis start
+        public Conversations Conversations
+        {
+            get
+            {
+                if (RainbowInterface == null || RainbowInterface.RainbowApplication == null)
+                {
+                    return null;
+                }
+
+                return RainbowInterface.RainbowApplication.GetConversations();
+            }
+        }
+
+
+
+        public InstantMessaging InstantMessaging
+        {
+            get
+            {
+                if (RainbowInterface == null || RainbowInterface.RainbowApplication == null)
+                {
+                    return null;
+                }
+
+                return RainbowInterface.RainbowApplication.GetInstantMessaging();
+            }
+        }
+
+        // Vagelis end
+
         #endregion // public fields
 
         #region public methods
