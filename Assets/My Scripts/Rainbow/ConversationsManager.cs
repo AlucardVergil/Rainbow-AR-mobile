@@ -54,8 +54,6 @@ public class ConversationsManager : MonoBehaviour
 
     public GameObject conversationScrollView;
 
-    int testing = 0;
-    int testing2 = 0;
 
 
     public void InitializeConversationsAndContacts() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
@@ -66,9 +64,6 @@ public class ConversationsManager : MonoBehaviour
         rbConversations = model.Conversations;
         rbContacts = model.Contacts;
 
-
-        testing++;
-        Debug.Log("TESTING " +  testing);
 
         /*
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
@@ -579,10 +574,14 @@ public class ConversationsManager : MonoBehaviour
                     //else
                     //    texts += $"<align=left>{messagesList[i].Content}</align>\n\n";
 
-                    if (myContact.Jid_im == messagesList[i].FromJid)
-                        CreateChatMessage(messagesList[i].Content, true, conversation.PeerId);
-                    else
-                        CreateChatMessage(messagesList[i].Content, false, conversation.PeerId);
+                    if (messagesList[i].Content != null) // check if content is null. These entries are bcz it includes call notifications
+                    {
+                        if (myContact.Jid_im == messagesList[i].FromJid)
+                            CreateChatMessage(messagesList[i].Content, true, conversation.PeerId);
+                        else
+                            CreateChatMessage(messagesList[i].Content, false, conversation.PeerId);
+                    }
+                    
                 }
 
                 doOnceRefreshTextArea = true; // Placed the bool above the conversationContentArea.text bcz when i placed it below the bool assignment wouldn't execute
@@ -765,8 +764,6 @@ public class ConversationsManager : MonoBehaviour
         string senderName = message.FromJid;       // Get sender's name
         string messageContent = message.Content;     // Get message content
 
-        testing2++;
-        Debug.Log("TESTING-2 " + testing2);
 
         if (isCarbonCopy)
         {
