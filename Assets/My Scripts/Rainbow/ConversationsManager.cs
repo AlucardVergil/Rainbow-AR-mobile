@@ -705,7 +705,20 @@ public class ConversationsManager : MonoBehaviour
         bool isTyping = evt.IsTyping;                // Is the contact typing or not?
 
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
-        {        
+        {
+            TMP_Text tempIsTypingTextArea = isTypingTextArea;
+
+            if (currentSelectedConversation.Type == Conversation.ConversationType.User)
+            {
+                Debug.Log("Peer-to-peer conversation.");
+                tempIsTypingTextArea = isTypingTextArea;
+            }
+            else if (currentSelectedConversation.Type == Conversation.ConversationType.Room)
+            {
+                Debug.Log("Room conversation.");
+                tempIsTypingTextArea = GetComponent<BubbleManager>().isTypingTextArea;
+            }
+
             // Display is typing only if you have the conversation open
             if (currentSelectedConversation.Id == conversationId)
             {
@@ -715,14 +728,14 @@ public class ConversationsManager : MonoBehaviour
                     Debug.Log($"User with Jid {contactJid} is typing in conversation {conversationId}.");
 
                     doOnceRefreshIsTypingTextArea = true;
-                    isTypingTextArea.text = $"{rbContacts.GetContactFromContactJid(contactJid).DisplayName} is typing...";
+                    tempIsTypingTextArea.text = $"{rbContacts.GetContactFromContactJid(contactJid).DisplayName} is typing...";
                 }
                 else
                 {
                     Debug.Log($"User with Jid {contactJid} stopped typing in conversation {conversationId}.");
 
                     doOnceRefreshIsTypingTextArea = true;
-                    isTypingTextArea.text = "";
+                    tempIsTypingTextArea.text = "";
                 }
             }
         });
