@@ -536,6 +536,13 @@ public class ConversationsManager : MonoBehaviour
                 layoutGroup.padding.left = 20;  // Adjust this value as needed
             }
 
+
+            // Force the Canvas to update before scrolling
+            Canvas.ForceUpdateCanvases();
+
+            // Set verticalNormalizedPosition to 0 to scroll to the bottom when new message is added
+            currentlySelectedConversationScrollViewContent.GetComponentInParent<ScrollRect>().verticalNormalizedPosition = 0f;
+
         });
     }
 
