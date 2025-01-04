@@ -201,6 +201,10 @@ namespace Cortex
         private bool createdDefaultAudio = false;
 
 
+        // vagelis
+        public GameObject incomingCallPanel;
+
+
         #region Unity entry points
         private void Awake()
         {
@@ -1166,19 +1170,30 @@ namespace Cortex
 
                 UnityExecutor.Execute(() =>
                 {
-                    if (AudioSourceToPublish == null)
+                    // Show the Accept/Reject panel
+                    ShowCallPanel(() =>
                     {
-                        Debug.LogError("Couldn't find an audio source");
-                        return;
-                    }
-                    Dictionary<int, IMediaStreamTrack> mediaStreams = new();
-                    AudioSourceToPublish.Play();
-                    var mediaAudio = UnityWebRTCFactory.CreateAudioTrack(UnityWebRTCFactory.CreateAudioMediaDevice(AudioSourceToPublish));
-                    mediaStreams.Add(Media.AUDIO, mediaAudio);
-                    RainbowExecutor.Execute(() =>
+                        AcceptCall(currentCallId);
+                    },
+                    () =>
                     {
-                        rbWebRTCCommunications.AnswerCall(currentCallId, mediaStreams);
+                        RejectCall(currentCallId);
                     });
+
+                    //if (AudioSourceToPublish == null)
+                    //{
+                    //    Debug.LogError("Couldn't find an audio source");
+                    //    return;
+                    //}
+                    //Dictionary<int, IMediaStreamTrack> mediaStreams = new();
+                    //AudioSourceToPublish.Play();
+                    //var mediaAudio = UnityWebRTCFactory.CreateAudioTrack(UnityWebRTCFactory.CreateAudioMediaDevice(AudioSourceToPublish));
+                    //mediaStreams.Add(Media.AUDIO, mediaAudio);
+                    //RainbowExecutor.Execute(() =>
+                    //{
+                    //    rbWebRTCCommunications.AnswerCall(currentCallId, mediaStreams);
+                    //    Debug.Log("ANSWER CALL");
+                    //});
 
                 });
             }
@@ -1224,6 +1239,74 @@ namespace Cortex
             }
 
         }
+
+
+        // vagelis start
+
+        void ShowCallPanel(Action onAccept, Action onReject)
+        {
+            incomingCallPanel.SetActive(true);
+                        
+            Button acceptButton = incomingCallPanel.transform.Find("AcceptButton").GetComponent<Button>();
+            Button rejectButton = incomingCallPanel.transform.Find("RejectButton").GetComponent<Button>();
+
+            // Assign button actions
+            acceptButton.onClick.RemoveAllListeners();
+            acceptButton.onClick.AddListener(() =>
+            {
+                onAccept?.Invoke();
+                incomingCallPanel.SetActive(false); // Hide the panel
+            });
+
+            rejectButton.onClick.RemoveAllListeners();
+            rejectButton.onClick.AddListener(() =>
+            {
+                onReject?.Invoke();
+                incomingCallPanel.SetActive(false); // Hide the panel
+            });
+        }
+
+
+
+        void AcceptCall(string callId)
+        {
+            if (AudioSourceToPublish == null)
+            {
+                Debug.LogError("Couldn't find an audio source");
+                return;
+            }
+
+            Dictionary<int, IMediaStreamTrack> mediaStreams = new();
+            AudioSourceToPublish.Play();
+            var mediaAudio = UnityWebRTCFactory.CreateAudioTrack(UnityWebRTCFactory.CreateAudioMediaDevice(AudioSourceToPublish));
+            mediaStreams.Add(Media.AUDIO, mediaAudio);
+
+            RainbowExecutor.Execute(() =>
+            {
+                rbWebRTCCommunications.AnswerCall(callId, mediaStreams);
+                Debug.Log("ANSWER CALL");
+            });
+        }
+
+
+
+        void RejectCall(string callId)
+        {
+            RainbowExecutor.Execute(() =>
+            {
+                rbWebRTCCommunications.RejectCall(callId);
+                Debug.Log("REJECT CALL");
+            });
+        }
+
+
+
+        // vagelis end
+
+
+
+
+
 
         private void WebRTCCommunications_OnTrack(string callId, MediaStreamTrackDescriptor mediaStreamTrackDescriptor)
         {

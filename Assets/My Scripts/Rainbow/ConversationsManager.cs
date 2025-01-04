@@ -708,6 +708,8 @@ public class ConversationsManager : MonoBehaviour
         {
             TMP_Text tempIsTypingTextArea = isTypingTextArea;
 
+            if (currentSelectedConversation == null) return; //this is to fix bug when there is an incoming call but this is not set yet
+
             if (currentSelectedConversation.Type == Conversation.ConversationType.User)
             {
                 Debug.Log("Peer-to-peer conversation.");
