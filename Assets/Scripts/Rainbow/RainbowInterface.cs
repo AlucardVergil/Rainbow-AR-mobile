@@ -200,6 +200,7 @@ namespace Cortex
 
         private bool createdDefaultAudio = false;
 
+
         #region Unity entry points
         private void Awake()
         {
@@ -302,6 +303,9 @@ namespace Cortex
 
         private void InitRainbowApp()
         {
+            //vagelis
+            UnityMainThreadDispatcher.Instance();
+
             // Subscribe to SDK Logs                
             var logFactory = new BasicLoggerFactory();
             logFactory.OnLogEntry += LogFactory_OnLogEntry;
@@ -896,6 +900,12 @@ namespace Cortex
             {
                 Debug.Log($"Presence is now {e.Presence.PresenceLevel}");
             }
+
+            //vagelis
+            UnityMainThreadDispatcher.Instance().Enqueue(() => { 
+                GetComponent<ConversationsManager>().InitializeConversationsAndContacts();
+                GetComponent<BubbleManager>().InitializeBubblesManager();
+            });
         }
 
         private void RainbowApplication_InitializationPerformed(object sender, EventArgs e)

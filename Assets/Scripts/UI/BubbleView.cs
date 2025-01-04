@@ -36,8 +36,7 @@ namespace Cortex
 
         // vagelis
         public GameObject bubblesGameobject;
-
-
+        public GameObject rainbowGameobject;
 
 
         override protected void OnStartOrEnable()
@@ -155,11 +154,13 @@ namespace Cortex
                 Bubble cur = b;
                 entry.OnClick += (e) =>
                 {
+                    rainbowGameobject.GetComponent<BubbleManager>().DisplayConversationsWithBubble(bubbles.GetBubbleByIdFromCache(cur.Id));
+
                     lock (bubbleLock)
                     {
                         // as bubble instances in the cache are replaced and not updated, we need to get the current one to propagate avatar updates
                         SelectBubble(bubbles.GetBubbleByIdFromCache(cur.Id));
-                    }
+                    }                    
                 };
             }
 

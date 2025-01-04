@@ -26,6 +26,9 @@ namespace Cortex
 
         private readonly ResetCancellationToken cancelLoad = new();
 
+
+        public GameObject rainbowGameobject;
+
         // Start is called before the first frame update
         void Awake()
         {
@@ -98,6 +101,7 @@ namespace Cortex
                 CurrentlySelected = entry.Contact;
                 OnSelectionChanged?.Invoke(this, entry.Contact);
 
+                rainbowGameobject.GetComponent<ConversationsManager>().DisplayConversationsWithContact(entry.Contact);
             }
         }
 

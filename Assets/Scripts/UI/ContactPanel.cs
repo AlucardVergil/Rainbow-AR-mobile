@@ -18,10 +18,22 @@ namespace Cortex
         private ContactView contactView;
         #endregion // ui-elements
 
+
+        // vagelis
+        public GameObject contactsGameobject;
+
+
         #region unity-lifecycle
 
         protected override void OnStartOrEnable()
         {
+            // vagelis
+
+            contactsGameobject.SetActive(true);
+
+            // end vagelis
+
+
             contactList.OnSelectionChanged += OnContactSelectedChanged;
 
             contactView.OnClickCall += OnClickCall;

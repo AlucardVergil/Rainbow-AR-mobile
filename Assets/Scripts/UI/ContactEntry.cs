@@ -83,6 +83,13 @@ namespace Cortex
             }
         }
 
+
+
+        // Vagelis
+        GameObject contactGameobject;
+
+
+
         void Awake()
         {
             if (displayName == null)
@@ -129,10 +136,23 @@ namespace Cortex
             }
         }
 
+
+
+        // Vagelis
+        private void Start()
+        {
+            contactGameobject = GameObject.FindGameObjectWithTag("Contacts");
+        }
+
+
+
         public void OnPointerClick(PointerEventData eventData)
         {
             OnClick?.Invoke(this);
             eventData.Use();
+
+            // Vagelis
+            contactGameobject.SetActive(false);
         }
     }
 } // end namespace Cortex

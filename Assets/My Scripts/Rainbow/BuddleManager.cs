@@ -6,6 +6,7 @@ using Rainbow.Model;
 using Rainbow.Events;
 using TMPro;
 using UnityEngine.UI;
+using Cortex;
 
 public class BubbleManager : MonoBehaviour
 {
@@ -20,6 +21,14 @@ public class BubbleManager : MonoBehaviour
 
     private Bubble currentSelectedBubble;
 
+    private InstantMessaging instantMessaging;
+    private Conversations rbConversations;
+
+    public TMP_InputField messageInputField;
+    public TMP_Text isTypingTextArea;
+
+    public Transform bubbleConversationScrollViewContent;
+    public GameObject bubbleConversationScrollView;
 
     private void Update()
     {
@@ -37,6 +46,7 @@ public class BubbleManager : MonoBehaviour
 
     public void InitializeBubblesManager() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
     {
+        /*
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
 
         rbBubbles = rbApplication.GetBubbles();
@@ -45,6 +55,16 @@ public class BubbleManager : MonoBehaviour
         myContact = rbContacts.GetCurrentContact();
 
         rbConferences = rbApplication.GetConferences();
+        */
+
+        ConnectionModel model = ConnectionModel.Instance;
+
+        instantMessaging = model.InstantMessaging;
+        rbConversations = model.Conversations;
+
+        rbBubbles = model.Bubbles;
+        rbContacts = model.Contacts;
+        myContact = rbContacts.GetCurrentContact();
 
         // Subscribe to invitation received event
         rbBubbles.BubbleInvitationReceived += Bubbles_BubbleInvitationReceived;
@@ -302,5 +322,53 @@ public class BubbleManager : MonoBehaviour
         {
             Debug.LogError("Exception: " + error.ExceptionError.Message);
         }
+    }
+
+
+
+
+
+    public void DisplayConversationsWithBubble(Bubble bubble)
+    {
+        var _conversationsManager = GetComponent<ConversationsManager>();
+
+        Conversation conversationWithBubble = _conversationsManager.OpenConversationWithBubble(bubble);
+        //conversationContentArea.text = conversationWithContact.LastMessageText;
+
+        _conversationsManager.currentSelectedConversation = conversationWithBubble;
+
+        // Save current contact avatar image for use in chat message prefab profile image
+        //currentChatMessageAvatar = avatarImage[contactGameobject.transform.GetSiblingIndex()];
+
+        // Use a lambda to pass the delegate to the onValueChanged event listener
+        // The lambda checks if the input field has any text (using !string.IsNullOrEmpty(value)),
+        // and if it does, SendIsTyping sends true to indicate typing. If the field is empty, it sends false.
+        messageInputField.onValueChanged.AddListener((string value) =>
+        {
+            _conversationsManager.SendIsTyping(conversationWithBubble, !string.IsNullOrEmpty(value));
+        });
+
+        _conversationsManager.FetchLastMessagesReceivedInConversation(conversationWithBubble);
+        //if (alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()])
+        //{
+        //    // Disable all message prefabs except the current contact's messages (the one that is open now)
+        //    for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
+        //    {
+        //        parentForAllMessagesOfEachContact[j].SetActive(false);
+        //    }
+        //    conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
+        //}
+        //else
+        //{
+        //    // Disable all message prefabs except the current contact's messages (the one that is open now)
+        //    for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
+        //    {
+        //        parentForAllMessagesOfEachContact[j].SetActive(false);
+        //    }
+        //    conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
+
+        //    alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()] = true;
+        //    FetchLastMessagesReceivedInConversation(conversationWithContact);
+        //}
     }
 }

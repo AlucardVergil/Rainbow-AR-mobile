@@ -11,8 +11,9 @@ using UnityEngine.UI;
 using System.Threading.Tasks;
 using System.Xml;
 using Cortex;
+using Unity.VisualScripting;
 
-public class ConversationsAndContactsBackup : MonoBehaviour
+public class ConversationsManager : MonoBehaviour
 {
     private Rainbow.Application rbApplication;
     private InstantMessaging instantMessaging;
@@ -29,7 +30,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
 
     public TMP_InputField messageInputField;
-    private Conversation currentSelectedConversation;
+    public Conversation currentSelectedConversation;
 
     private bool initializationPerformedFlag = false;
     private byte[] avatarData;
@@ -48,12 +49,12 @@ public class ConversationsAndContactsBackup : MonoBehaviour
     public GameObject chatMessagePrefabMyself;
     private Image currentChatMessageAvatar;
 
-    private bool [] alreadyFetchedMessagesForThisContactOnce;
+    private bool[] alreadyFetchedMessagesForThisContactOnce;
     private GameObject[] parentForAllMessagesOfEachContact;
 
     public GameObject conversationScrollView;
 
-
+    
 
 
     public void InitializeConversationsAndContacts() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
@@ -63,7 +64,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
         instantMessaging = model.InstantMessaging;
         rbConversations = model.Conversations;
         rbContacts = model.Contacts;
-
+ 
         /*
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
 
@@ -82,7 +83,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
         rbContacts.PeerAvatarDeleted += MyApp_PeerAvatarDeleted;
 
         FetchAllConversations();
-        FetchAllContactsInRoster();
+        //FetchAllContactsInRoster();
     }
 
 
@@ -91,9 +92,9 @@ public class ConversationsAndContactsBackup : MonoBehaviour
     private async void Update()
     {
         // Force refresh conversation text area. When the text was assigned it didn't refresh so i used this to force refresh it
-        if (doOnceRefreshTextArea) 
-        {            
-            doOnceRefreshTextArea = false; 
+        if (doOnceRefreshTextArea)
+        {
+            doOnceRefreshTextArea = false;
 
             await Task.Delay(200); // Placed delay to give it a little time to first update the conversation text and then refresh the conversation area object
 
@@ -109,7 +110,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
             StartCoroutine(RefreshIsTypingTextArea());
         }
-            
+
 
 
 
@@ -125,7 +126,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
             if (doOnce)
             {
                 doOnce = false;
-                for (int i = 0; i < tempContacts.Length; i++) 
+                for (int i = 0; i < tempContacts.Length; i++)
                 {
                     Debug.Log("GetContactAvatar = " + i);
                     GetContactAvatar(tempContacts[i].Id);
@@ -133,13 +134,13 @@ public class ConversationsAndContactsBackup : MonoBehaviour
                     await Task.Delay(500); // Wait for 500ms
                 }
             }
-            
 
 
 
-            if (tempCount >= tempContacts.Length)  
+
+            if (tempCount >= tempContacts.Length)
             {
-                for (int i = 0; i < tempContacts.Length; i++)  
+                for (int i = 0; i < tempContacts.Length; i++)
                 {
                     Debug.Log("HandleAvatarData = " + i);
 
@@ -157,7 +158,6 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
 
         }
-
     }
 
 
@@ -186,7 +186,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
         isTypingTextArea.gameObject.SetActive(true);
     }
 
-    
+
 
 
     void UpdateTextContentHeight()
@@ -324,7 +324,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
                     layout.spacing = 20;
                     layout.padding = new RectOffset(10, 10, 10, 10);
-                    layout.childControlHeight = false;                    
+                    layout.childControlHeight = false;
                     layout.childForceExpandHeight = false;
                     layout.childForceExpandWidth = true;
                     layout.childControlWidth = true;
@@ -397,7 +397,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
 
 
-                    
+
 
 
 
@@ -428,7 +428,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
     public Conversation OpenConversationWithContact(Contact contact)
     {
         //Conversations conversations = RainbowManager.Instance.GetRainbowApplication().GetConversations();
-
+       
         return rbConversations.GetOrCreateConversationFromUserId(contact.Id);
     }
 
@@ -466,23 +466,48 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
     void CreateChatMessage(string messageText, bool isOwnMessage, string contactID)
     {
+
+
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
             GameObject newMessage;
 
-            // Instantiate the chat message prefab
-            if ( !isOwnMessage)
+            Transform currentlySelectedConversationScrollViewContent = conversationScrollViewContent;
+
+            if (currentSelectedConversation.Type == Conversation.ConversationType.User)
             {
-                newMessage = Instantiate(chatMessagePrefab, conversationScrollViewContent.Find(contactID));
+                Debug.Log("Peer-to-peer conversation.");
+                currentlySelectedConversationScrollViewContent = conversationScrollViewContent;
+            }
+            else if (currentSelectedConversation.Type == Conversation.ConversationType.Room)
+            {
+                Debug.Log("Room conversation.");
+                currentlySelectedConversationScrollViewContent = GetComponent<BubbleManager>().bubbleConversationScrollViewContent;
+            }
+
+
+            // Instantiate the chat message prefab
+            if (!isOwnMessage)
+            {                
+                //newMessage = Instantiate(chatMessagePrefab, conversationScrollViewContent.Find(contactID));
+                newMessage = Instantiate(chatMessagePrefab, currentlySelectedConversationScrollViewContent);
 
                 // Get references to the Image and TextMeshProUGUI components in the prefab and Assign the profile photo (avatar) and the message text
                 Image profileImage = newMessage.GetComponentInChildren<Image>();
-                profileImage.sprite = currentChatMessageAvatar.sprite;
+                //profileImage.sprite = currentChatMessageAvatar.sprite;
             }
             else
             {
-                newMessage = Instantiate(chatMessagePrefabMyself, conversationScrollViewContent.Find(contactID));
+                //newMessage = Instantiate(chatMessagePrefabMyself, conversationScrollViewContent.Find(contactID));
+                newMessage = Instantiate(chatMessagePrefabMyself, currentlySelectedConversationScrollViewContent);
             }
+
+            RectTransform rectTransform = newMessage.GetComponent<RectTransform>();
+
+            // Change only the width while keeping the height the same
+            Vector2 newSize = rectTransform.sizeDelta;
+            newSize.x = 800; // Set the desired width
+            rectTransform.sizeDelta = newSize;
 
             TMP_Text messageTextComponent = newMessage.GetComponentInChildren<TMP_Text>();
             messageTextComponent.text = messageText;
@@ -565,7 +590,7 @@ public class ConversationsAndContactsBackup : MonoBehaviour
 
 
 
-    
+
 
 
 
@@ -584,8 +609,33 @@ public class ConversationsAndContactsBackup : MonoBehaviour
     {
         //InstantMessaging instantMessaging = RainbowManager.Instance.GetRainbowApplication().GetInstantMessaging();
 
-
         instantMessaging.SendMessageToConversation(currentSelectedConversation, messageInputField.text, null, UrgencyType.Std, null, callback =>
+        {
+            if (callback.Result.Success)
+            {
+                Debug.Log("Message sent.");
+
+                // Refresh the messages in display
+                //FetchLastMessagesReceivedInConversation(currentSelectedConversation);
+
+                //conversationContentArea.text += $"<align=right>{messageInputField.text}</align>\n\n"; ;
+                //doOnceRefreshTextArea = true; // Here it works even if it's below. The problem is the retrieval of texts not the sending
+
+                CreateChatMessage(messageInputField.text, true, currentSelectedConversation.PeerId);
+            }
+            else
+            {
+                HandleError(callback.Result);
+            }
+        });
+    }
+
+
+    public void SendMessageToBubbleConversation()
+    {
+        //InstantMessaging instantMessaging = RainbowManager.Instance.GetRainbowApplication().GetInstantMessaging();
+
+        instantMessaging.SendMessageToConversation(currentSelectedConversation, GetComponent<BubbleManager>().messageInputField.text, null, UrgencyType.Std, null, callback =>
         {
             if (callback.Result.Success)
             {
@@ -654,28 +704,29 @@ public class ConversationsAndContactsBackup : MonoBehaviour
         string contactJid = evt.ContactJid;          // Jid of the contact who is typing
         bool isTyping = evt.IsTyping;                // Is the contact typing or not?
 
-
-        // Display is typing only if you have the conversation open
-        if (currentSelectedConversation.Id == conversationId)
-        {
-            // Handle 'is typing' status update
-            if (isTyping)
+        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+        {        
+            // Display is typing only if you have the conversation open
+            if (currentSelectedConversation.Id == conversationId)
             {
-                Debug.Log($"User with Jid {contactJid} is typing in conversation {conversationId}.");
+                // Handle 'is typing' status update
+                if (isTyping)
+                {
+                    Debug.Log($"User with Jid {contactJid} is typing in conversation {conversationId}.");
 
-                doOnceRefreshIsTypingTextArea = true;
-                isTypingTextArea.text = $"{rbContacts.GetContactFromContactJid(contactJid).DisplayName} is typing...";
+                    doOnceRefreshIsTypingTextArea = true;
+                    isTypingTextArea.text = $"{rbContacts.GetContactFromContactJid(contactJid).DisplayName} is typing...";
+                }
+                else
+                {
+                    Debug.Log($"User with Jid {contactJid} stopped typing in conversation {conversationId}.");
+
+                    doOnceRefreshIsTypingTextArea = true;
+                    isTypingTextArea.text = "";
+                }
             }
-            else
-            {
-                Debug.Log($"User with Jid {contactJid} stopped typing in conversation {conversationId}.");
+        });
 
-                doOnceRefreshIsTypingTextArea = true;
-                isTypingTextArea.text = "";
-            }
-        }
-
-        
     }
 
 
@@ -951,6 +1002,53 @@ public class ConversationsAndContactsBackup : MonoBehaviour
             // Exception occurs
             Debug.LogError($"Exception: {error.ExceptionError}");
         }
+    }
+
+
+
+
+
+    public void DisplayConversationsWithContact(Contact contact)
+    {
+
+        Conversation conversationWithContact = OpenConversationWithContact(contact);
+        //conversationContentArea.text = conversationWithContact.LastMessageText;
+
+        currentSelectedConversation = conversationWithContact;
+
+        // Save current contact avatar image for use in chat message prefab profile image
+        //currentChatMessageAvatar = avatarImage[contactGameobject.transform.GetSiblingIndex()];
+
+        // Use a lambda to pass the delegate to the onValueChanged event listener
+        // The lambda checks if the input field has any text (using !string.IsNullOrEmpty(value)),
+        // and if it does, SendIsTyping sends true to indicate typing. If the field is empty, it sends false.
+        messageInputField.onValueChanged.AddListener((string value) =>
+        {
+            SendIsTyping(conversationWithContact, !string.IsNullOrEmpty(value));
+        });
+
+        FetchLastMessagesReceivedInConversation(conversationWithContact);
+        //if (alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()])
+        //{
+        //    // Disable all message prefabs except the current contact's messages (the one that is open now)
+        //    for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
+        //    {
+        //        parentForAllMessagesOfEachContact[j].SetActive(false);
+        //    }
+        //    conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
+        //}
+        //else
+        //{
+        //    // Disable all message prefabs except the current contact's messages (the one that is open now)
+        //    for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
+        //    {
+        //        parentForAllMessagesOfEachContact[j].SetActive(false);
+        //    }
+        //    conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
+
+        //    alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()] = true;
+        //    FetchLastMessagesReceivedInConversation(conversationWithContact);
+        //}
     }
 
 }
