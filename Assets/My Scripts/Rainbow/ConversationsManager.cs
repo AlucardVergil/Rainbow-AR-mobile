@@ -54,7 +54,8 @@ public class ConversationsManager : MonoBehaviour
 
     public GameObject conversationScrollView;
 
-    
+    int testing = 0;
+    int testing2 = 0;
 
 
     public void InitializeConversationsAndContacts() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
@@ -64,7 +65,11 @@ public class ConversationsManager : MonoBehaviour
         instantMessaging = model.InstantMessaging;
         rbConversations = model.Conversations;
         rbContacts = model.Contacts;
- 
+
+
+        testing++;
+        Debug.Log("TESTING " +  testing);
+
         /*
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
 
@@ -545,8 +550,6 @@ public class ConversationsManager : MonoBehaviour
 
     public void FetchLastMessagesReceivedInConversation(Conversation conversation, int numOfMessages = 200)
     {
-        //InstantMessaging instantMessaging = RainbowManager.Instance.GetRainbowApplication().GetInstantMessaging();   
-
         instantMessaging.GetMessagesFromConversation(conversation, numOfMessages, callback =>
         {
             if (callback.Result.Success)
@@ -556,6 +559,11 @@ public class ConversationsManager : MonoBehaviour
 
                 Debug.Log("listCount = " + messagesList.Count);
 
+                if (messagesList.Count <= 0)
+                {
+                    messagesList = FetchAllMessagesInConversationFromCache(conversation);
+                    Debug.Log("listCount from cache = " + messagesList.Count);
+                }
 
                 // Process retreived messages
                 string texts = "";
@@ -756,6 +764,9 @@ public class ConversationsManager : MonoBehaviour
         // Process the message
         string senderName = message.FromJid;       // Get sender's name
         string messageContent = message.Content;     // Get message content
+
+        testing2++;
+        Debug.Log("TESTING-2 " + testing2);
 
         if (isCarbonCopy)
         {
@@ -1064,6 +1075,26 @@ public class ConversationsManager : MonoBehaviour
         //    alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()] = true;
         //    FetchLastMessagesReceivedInConversation(conversationWithContact);
         //}
+    }
+
+
+    public void ResetConversationContentGameobject()
+    {
+        if (conversationScrollViewContent.transform.childCount > 0)
+        {
+            foreach (Transform child in conversationScrollViewContent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        if (GetComponent<BubbleManager>().bubbleConversationScrollViewContent.transform.childCount > 0)
+        {
+            foreach (Transform child in GetComponent<BubbleManager>().bubbleConversationScrollViewContent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
     }
 
 }

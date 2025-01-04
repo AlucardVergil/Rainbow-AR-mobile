@@ -904,12 +904,6 @@ namespace Cortex
             {
                 Debug.Log($"Presence is now {e.Presence.PresenceLevel}");
             }
-
-            //vagelis
-            UnityMainThreadDispatcher.Instance().Enqueue(() => { 
-                GetComponent<ConversationsManager>().InitializeConversationsAndContacts();
-                GetComponent<BubbleManager>().InitializeBubblesManager();
-            });
         }
 
         private void RainbowApplication_InitializationPerformed(object sender, EventArgs e)
@@ -965,6 +959,15 @@ namespace Cortex
             UnityExecutor.Execute(() =>
             {
                 ConnectionChanged?.Invoke(e.ConnectionState.State);
+
+                //vagelis
+                if (e.ConnectionState.State == ConnectionState.Connected)
+                {                    
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => {
+                        GetComponent<ConversationsManager>().InitializeConversationsAndContacts();
+                        GetComponent<BubbleManager>().InitializeBubblesManager();
+                    });
+                }
             });
         }
 
