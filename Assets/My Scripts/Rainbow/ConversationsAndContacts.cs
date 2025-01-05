@@ -63,7 +63,7 @@ public class ConversationsAndContacts : MonoBehaviour
         instantMessaging = model.InstantMessaging;
         rbConversations = model.Conversations;
         rbContacts = model.Contacts;
-
+        
         /*
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
 

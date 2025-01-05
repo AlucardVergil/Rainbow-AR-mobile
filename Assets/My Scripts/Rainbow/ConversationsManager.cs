@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Cortex;
 using Unity.VisualScripting;
+using System.Diagnostics.Contracts;
 
 public class ConversationsManager : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class ConversationsManager : MonoBehaviour
     private InstantMessaging instantMessaging;
     private Conversations rbConversations;
     private Contacts rbContacts;
+    private Invitations rbInvitations;
 
     //Contact prefab and target parent
     public GameObject contactPrefab;
@@ -63,8 +65,9 @@ public class ConversationsManager : MonoBehaviour
         instantMessaging = model.InstantMessaging;
         rbConversations = model.Conversations;
         rbContacts = model.Contacts;
+        rbInvitations = model.Invitations;
 
-
+        
         /*
         rbApplication = RainbowManager.Instance.GetRainbowApplication();
 
@@ -82,10 +85,12 @@ public class ConversationsManager : MonoBehaviour
         rbContacts.PeerAvatarChanged += MyApp_PeerAvatarChanged;
         rbContacts.PeerAvatarDeleted += MyApp_PeerAvatarDeleted;
 
+        rbContacts.RosterPeerAdded += MyApp_RosterPeerAdded;
+        rbContacts.RosterPeerRemoved += MyApp_RosterPeerRemoved;
+
         FetchAllConversations();
         //FetchAllContactsInRoster();
     }
-
 
 
 
@@ -270,150 +275,6 @@ public class ConversationsManager : MonoBehaviour
                     }
                 }
 
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
-        });
-    }
-
-
-
-    public void FetchAllContactsInRoster()
-    {
-        //Contacts contacts = RainbowManager.Instance.GetRainbowApplication().GetContacts();
-
-        rbContacts.GetAllContactsInRoster(callback =>
-        {
-            if (callback.Result.Success)
-            {
-                List<Contact> contactList = callback.Data;  // List of contacts
-
-
-                avatarImage = new Image[contactList.Count];
-                tempContacts = new Contact[contactList.Count];
-
-                tempAvatarData = new byte[contactList.Count][];
-
-
-
-                // Set the bool array to false which will be used to check if the chatMessage gameobjects were already fetched and instantiated once in scene so that I will
-                // make them children of one gameobject in order to disable and enable the messages of each contact's conversation when I open the chat of the corresponding contact.
-                // This was done so that i won't have to instantiate and destroy all messages every time I switch between contacts and also bcz once the api fetched the messages of each 
-                // contact once, the message list becomes 0 and then i can't fetch them again, so i basically save them in scene and the 2nd time i open the conversation of a contact the 
-                // messages are already fetched from the 1st time and i just enable and disable them in scene.
-                alreadyFetchedMessagesForThisContactOnce = new bool[contactList.Count];
-                parentForAllMessagesOfEachContact = new GameObject[contactList.Count];
-
-                for (int i = 0; i < alreadyFetchedMessagesForThisContactOnce.Length; i++)
-                {
-                    alreadyFetchedMessagesForThisContactOnce[i] = false;
-
-                    parentForAllMessagesOfEachContact[i] = new GameObject(contactList[i].Id);
-                    //parentForAllMessagesOfEachContact[i].transform.parent = conversationScrollViewContent;
-                    parentForAllMessagesOfEachContact[i].transform.SetParent(conversationScrollViewContent, false);
-
-
-                    parentForAllMessagesOfEachContact[i].AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-                    VerticalLayoutGroup layout = parentForAllMessagesOfEachContact[i].AddComponent<VerticalLayoutGroup>();
-
-                    RectTransform parentRectTransform = parentForAllMessagesOfEachContact[i].GetComponent<RectTransform>();
-                    //parentRectTransform.sizeDelta = new Vector2(parentRectTransform.rect.width, parentRectTransform.sizeDelta.y);
-                    parentRectTransform.sizeDelta = new Vector2(670, parentRectTransform.sizeDelta.y);
-
-                    layout.spacing = 20;
-                    layout.padding = new RectOffset(10, 10, 10, 10);
-                    layout.childControlHeight = false;
-                    layout.childForceExpandHeight = false;
-                    layout.childForceExpandWidth = true;
-                    layout.childControlWidth = true;
-
-                    layout.GetComponent<RectTransform>().sizeDelta = new Vector2(938, layout.GetComponent<RectTransform>().sizeDelta.y);
-
-
-
-
-                }
-
-
-
-
-                for (int i = 0; i < contactList.Count; i++)
-                //foreach (Contact contact in contactList)
-                {
-                    Debug.Log($"Contact Name: {contactList[i].DisplayName}, ID: {contactList[i].Id}");
-
-                    GameObject contactGameobject = Instantiate(contactPrefab, contactScrollViewContent);
-
-                    contactGameobject.GetComponentInChildren<TMP_Text>().text = contactList[i].DisplayName;
-
-                    contactGameobject.GetComponent<Button>().onClick.AddListener(() => {
-
-                        GetComponent<MenuManager>().OpenCloseChatPanels(1);
-
-                        // Used siblingIndex instead of i because in addlistener it used the last assigned value of i in everything
-                        Conversation conversationWithContact = OpenConversationWithContact(contactList[contactGameobject.transform.GetSiblingIndex()]);
-                        //conversationContentArea.text = conversationWithContact.LastMessageText;
-
-                        currentSelectedConversation = conversationWithContact;
-
-                        // Save current contact avatar image for use in chat message prefab profile image
-                        currentChatMessageAvatar = avatarImage[contactGameobject.transform.GetSiblingIndex()];
-
-                        // Use a lambda to pass the delegate to the onValueChanged event listener
-                        // The lambda checks if the input field has any text (using !string.IsNullOrEmpty(value)),
-                        // and if it does, SendIsTyping sends true to indicate typing. If the field is empty, it sends false.
-                        messageInputField.onValueChanged.AddListener((string value) =>
-                        {
-                            SendIsTyping(conversationWithContact, !string.IsNullOrEmpty(value));
-                        });
-
-                        Debug.Log($"Contact i: {i} => {contactGameobject.transform.GetSiblingIndex()}");
-
-                        if (alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()])
-                        {
-                            // Disable all message prefabs except the current contact's messages (the one that is open now)
-                            for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
-                            {
-                                parentForAllMessagesOfEachContact[j].SetActive(false);
-                            }
-                            conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
-                        }
-                        else
-                        {
-                            // Disable all message prefabs except the current contact's messages (the one that is open now)
-                            for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
-                            {
-                                parentForAllMessagesOfEachContact[j].SetActive(false);
-                            }
-                            conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
-
-                            alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()] = true;
-                            FetchLastMessagesReceivedInConversation(conversationWithContact);
-                        }
-                        GetComponent<MenuManager>().OpenCloseChatPanels(1);
-                    });
-
-
-
-
-
-
-
-                    // Display the contact's avatar image
-                    avatarImage[i] = contactGameobject.GetComponent<Image>();
-
-                    tempContacts[i] = contactList[i];
-
-                    // Hide 1st contact because it's the current user himself
-                    if (i == 0)
-                        contactGameobject.SetActive(false);
-                }
-
-                initializationPerformedFlag = true;
-
-                UpdateContentHeight();
             }
             else
             {
@@ -788,39 +649,7 @@ public class ConversationsManager : MonoBehaviour
 
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-    // Retrieve a contact using its Contact ID
-    public Contact GetContactById(string contactId)
-    {
-        return rbContacts.GetContactFromContactId(contactId);
-    }
-
-    // Retrieve a contact from the server (useful if it's not in the local roster)
-    public void GetContactFromServer(string contactId)
-    {
-        rbContacts.GetContactFromContactIdFromServer(contactId, callback =>
-        {
-            if (callback.Result.Success)
-            {
-                Contact contact = callback.Data;
-                Debug.Log($"Contact found: {contact.DisplayName}");
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
-        });
-    }
+    
 
 
     #region Contacts Avatar Image
@@ -979,41 +808,7 @@ public class ConversationsManager : MonoBehaviour
 
 
 
-    // Search for contacts by display name
-    public void SearchContactByName(string nameToSearch, int maxNbResult = 20)
-    {
-        rbContacts.SearchContactsByDisplayName(nameToSearch, maxNbResult, callback =>
-        {
-            if (callback.Result.Success)
-            {
-                var searchResult = callback.Data;
-
-                foreach (Contact contact in searchResult.ContactsList)
-                {
-                    Debug.Log($"Contact found: {contact.DisplayName}");
-                }
-
-                foreach (Phonebook phonebook in searchResult.PhonebooksList)
-                {
-                    Debug.Log("Phonebook contact found.");
-                }
-
-                foreach (O365AdContact contact in searchResult.O365AdContactsList)
-                {
-                    Debug.Log("Office 365 contact found.");
-                }
-
-                foreach (DirectoryContact contact in searchResult.DirectoryContactsList)
-                {
-                    Debug.Log("Enterprise directory contact found.");
-                }
-            }
-            else
-            {
-                HandleError(callback.Result);
-            }
-        });
-    }
+    
 
 
 
@@ -1100,5 +895,265 @@ public class ConversationsManager : MonoBehaviour
             }
         }
     }
+
+
+
+    #region Contacts Methods
+    // Search for contacts by display name
+    public void SearchContactByName(string nameToSearch, int maxNbResult = 20)
+    {
+        rbContacts.SearchContactsByDisplayName(nameToSearch, maxNbResult, callback =>
+        {
+            if (callback.Result.Success)
+            {
+                var searchResult = callback.Data;
+
+                foreach (Contact contact in searchResult.ContactsList)
+                {
+                    Debug.Log($"Contact found: {contact.DisplayName}");
+                }
+
+                foreach (Phonebook phonebook in searchResult.PhonebooksList)
+                {
+                    Debug.Log("Phonebook contact found.");
+                }
+
+                foreach (O365AdContact contact in searchResult.O365AdContactsList)
+                {
+                    Debug.Log("Office 365 contact found.");
+                }
+
+                foreach (DirectoryContact contact in searchResult.DirectoryContactsList)
+                {
+                    Debug.Log("Enterprise directory contact found.");
+                }
+            }
+            else
+            {
+                HandleError(callback.Result);
+            }
+        });
+    }
+
+
+
+    // Retrieve a contact using its Contact ID
+    public Contact GetContactById(string contactId)
+    {
+        return rbContacts.GetContactFromContactId(contactId);
+    }
+
+    // Retrieve a contact from the server (useful if it's not in the local roster)
+    public void GetContactFromServer(string contactId)
+    {
+        rbContacts.GetContactFromContactIdFromServer(contactId, callback =>
+        {
+            if (callback.Result.Success)
+            {
+                Contact contact = callback.Data;
+                Debug.Log($"Contact found: {contact.DisplayName}");
+            }
+            else
+            {
+                HandleError(callback.Result);
+            }
+        });
+    }
+
+
+
+    public void FetchAllContactsInRoster()
+    {
+        //Contacts contacts = RainbowManager.Instance.GetRainbowApplication().GetContacts();
+
+        rbContacts.GetAllContactsInRoster(callback =>
+        {
+            if (callback.Result.Success)
+            {
+                List<Contact> contactList = callback.Data;  // List of contacts
+
+
+                avatarImage = new Image[contactList.Count];
+                tempContacts = new Contact[contactList.Count];
+
+                tempAvatarData = new byte[contactList.Count][];
+
+
+
+                // Set the bool array to false which will be used to check if the chatMessage gameobjects were already fetched and instantiated once in scene so that I will
+                // make them children of one gameobject in order to disable and enable the messages of each contact's conversation when I open the chat of the corresponding contact.
+                // This was done so that i won't have to instantiate and destroy all messages every time I switch between contacts and also bcz once the api fetched the messages of each 
+                // contact once, the message list becomes 0 and then i can't fetch them again, so i basically save them in scene and the 2nd time i open the conversation of a contact the 
+                // messages are already fetched from the 1st time and i just enable and disable them in scene.
+                alreadyFetchedMessagesForThisContactOnce = new bool[contactList.Count];
+                parentForAllMessagesOfEachContact = new GameObject[contactList.Count];
+
+                for (int i = 0; i < alreadyFetchedMessagesForThisContactOnce.Length; i++)
+                {
+                    alreadyFetchedMessagesForThisContactOnce[i] = false;
+
+                    parentForAllMessagesOfEachContact[i] = new GameObject(contactList[i].Id);
+                    //parentForAllMessagesOfEachContact[i].transform.parent = conversationScrollViewContent;
+                    parentForAllMessagesOfEachContact[i].transform.SetParent(conversationScrollViewContent, false);
+
+
+                    parentForAllMessagesOfEachContact[i].AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    VerticalLayoutGroup layout = parentForAllMessagesOfEachContact[i].AddComponent<VerticalLayoutGroup>();
+
+                    RectTransform parentRectTransform = parentForAllMessagesOfEachContact[i].GetComponent<RectTransform>();
+                    //parentRectTransform.sizeDelta = new Vector2(parentRectTransform.rect.width, parentRectTransform.sizeDelta.y);
+                    parentRectTransform.sizeDelta = new Vector2(670, parentRectTransform.sizeDelta.y);
+
+                    layout.spacing = 20;
+                    layout.padding = new RectOffset(10, 10, 10, 10);
+                    layout.childControlHeight = false;
+                    layout.childForceExpandHeight = false;
+                    layout.childForceExpandWidth = true;
+                    layout.childControlWidth = true;
+
+                    layout.GetComponent<RectTransform>().sizeDelta = new Vector2(938, layout.GetComponent<RectTransform>().sizeDelta.y);
+
+
+
+
+                }
+
+
+
+
+                for (int i = 0; i < contactList.Count; i++)
+                //foreach (Contact contact in contactList)
+                {
+                    Debug.Log($"Contact Name: {contactList[i].DisplayName}, ID: {contactList[i].Id}");
+
+                    GameObject contactGameobject = Instantiate(contactPrefab, contactScrollViewContent);
+
+                    contactGameobject.GetComponentInChildren<TMP_Text>().text = contactList[i].DisplayName;
+
+                    contactGameobject.GetComponent<Button>().onClick.AddListener(() => {
+
+                        GetComponent<MenuManager>().OpenCloseChatPanels(1);
+
+                        // Used siblingIndex instead of i because in addlistener it used the last assigned value of i in everything
+                        Conversation conversationWithContact = OpenConversationWithContact(contactList[contactGameobject.transform.GetSiblingIndex()]);
+                        //conversationContentArea.text = conversationWithContact.LastMessageText;
+
+                        currentSelectedConversation = conversationWithContact;
+
+                        // Save current contact avatar image for use in chat message prefab profile image
+                        currentChatMessageAvatar = avatarImage[contactGameobject.transform.GetSiblingIndex()];
+
+                        // Use a lambda to pass the delegate to the onValueChanged event listener
+                        // The lambda checks if the input field has any text (using !string.IsNullOrEmpty(value)),
+                        // and if it does, SendIsTyping sends true to indicate typing. If the field is empty, it sends false.
+                        messageInputField.onValueChanged.AddListener((string value) =>
+                        {
+                            SendIsTyping(conversationWithContact, !string.IsNullOrEmpty(value));
+                        });
+
+                        Debug.Log($"Contact i: {i} => {contactGameobject.transform.GetSiblingIndex()}");
+
+                        if (alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()])
+                        {
+                            // Disable all message prefabs except the current contact's messages (the one that is open now)
+                            for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
+                            {
+                                parentForAllMessagesOfEachContact[j].SetActive(false);
+                            }
+                            conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            // Disable all message prefabs except the current contact's messages (the one that is open now)
+                            for (int j = 0; j < parentForAllMessagesOfEachContact.Length; j++)
+                            {
+                                parentForAllMessagesOfEachContact[j].SetActive(false);
+                            }
+                            conversationScrollViewContent.Find(contactList[contactGameobject.transform.GetSiblingIndex()].Id).gameObject.SetActive(true);
+
+                            alreadyFetchedMessagesForThisContactOnce[contactGameobject.transform.GetSiblingIndex()] = true;
+                            FetchLastMessagesReceivedInConversation(conversationWithContact);
+                        }
+                        GetComponent<MenuManager>().OpenCloseChatPanels(1);
+                    });
+
+
+
+
+
+
+
+                    // Display the contact's avatar image
+                    avatarImage[i] = contactGameobject.GetComponent<Image>();
+
+                    tempContacts[i] = contactList[i];
+
+                    // Hide 1st contact because it's the current user himself
+                    if (i == 0)
+                        contactGameobject.SetActive(false);
+                }
+
+                initializationPerformedFlag = true;
+
+                UpdateContentHeight();
+            }
+            else
+            {
+                HandleError(callback.Result);
+            }
+        });
+    }
+
+
+
+
+    public void AddContact(string contactId)
+    {
+        rbInvitations.SendInvitationByContactId(contactId, callback =>
+        {
+            if (callback.Result.Success)
+            {
+                Invitation invitation = callback.Data;  // Invitation state
+            }
+            else
+            {
+                HandleError(callback.Result);
+            }
+        });
+    }
+
+
+
+
+    public void RemoveContact(string contactId)
+    {
+        rbContacts.RemoveFromContactId(contactId, callback =>
+        {
+            if (callback.Result.Success)
+            {
+                // Contact has been removed  from the roster
+            }
+            else
+            {
+                HandleError(callback.Result);
+            }
+        });
+    }
+
+
+
+   
+                                        
+    private void MyApp_RosterPeerAdded(object sender, PeerEventArgs evt) // TO CHECK this: JidEventArgs evt instead of PeerEventArgs
+    {
+        string jid = evt.Peer.Jid; // JID of the contact added
+    }
+
+    private void MyApp_RosterPeerRemoved(object sender, PeerEventArgs evt)
+    {
+        string jid = evt.Peer.Jid; // JID of the contact removed
+    }
+
+    #endregion
 
 }

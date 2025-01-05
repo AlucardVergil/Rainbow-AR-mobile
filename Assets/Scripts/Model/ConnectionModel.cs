@@ -360,6 +360,20 @@ namespace Cortex
             }
         }
 
+
+        public Invitations Invitations
+        {
+            get
+            {
+                if (RainbowInterface == null || RainbowInterface.RainbowApplication == null)
+                {
+                    return null;
+                }
+
+                return RainbowInterface.RainbowApplication.GetInvitations();
+            }
+        }
+
         // Vagelis end
 
         #endregion // public fields
