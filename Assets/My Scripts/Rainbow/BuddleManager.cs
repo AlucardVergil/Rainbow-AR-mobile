@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using Cortex;
 using System.Collections;
 using System.Threading.Tasks;
+using Unity.Tutorials.Core.Editor;
 
 public class BubbleManager : MonoBehaviour
 {
@@ -245,6 +246,8 @@ public class BubbleManager : MonoBehaviour
 
     public void CreateBubbleHandler()
     {
+        if (bubbleName.text.IsNullOrEmpty()) return;
+
         CreateBubble(bubbleName.text, bubbleSubject?.text);
 
         bubbleName.text = null;
