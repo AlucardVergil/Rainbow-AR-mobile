@@ -6,16 +6,18 @@ using Rainbow.Model;
 using Rainbow.Events;
 using Cortex;
 
+
 public class FileManager : MonoBehaviour
 {
     private FileStorage fileStorage;
     private InstantMessaging instantMessaging;
     private string fileDescriptorId; // To track file upload progress
+    
 
     public void InitializeFileManager() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
     {
         ConnectionModel model = ConnectionModel.Instance;
-
+        
         instantMessaging = model.InstantMessaging;
         fileStorage = model.FileStorage;
 
@@ -128,7 +130,7 @@ public class FileManager : MonoBehaviour
             if (callback.Result.Success)
             {
                 List<FileDescriptor> files = callback.Data;
-                // Process all files
+                // Process all files                
             }
             else
             {

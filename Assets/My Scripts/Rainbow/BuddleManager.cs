@@ -7,6 +7,8 @@ using Rainbow.Events;
 using TMPro;
 using UnityEngine.UI;
 using Cortex;
+using System.Collections;
+using System.Threading.Tasks;
 
 public class BubbleManager : MonoBehaviour
 {
@@ -30,6 +32,12 @@ public class BubbleManager : MonoBehaviour
     public Transform bubbleConversationScrollViewContent;
     public GameObject bubbleConversationScrollView;
 
+    
+    public GameObject createBubblePanel;
+    public TMP_InputField bubbleName;
+    public TMP_InputField bubbleSubject;
+    public GameObject bubblePanel;
+
     private void Update()
     {
         //if (Input.GetKeyDown(KeyCode.F))
@@ -40,24 +48,8 @@ public class BubbleManager : MonoBehaviour
     }
 
 
-    private void Start()
-    {
-        //InitializeBubblesManager();
-    }
-
     public void InitializeBubblesManager() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
     {
-        /*
-        rbApplication = RainbowManager.Instance.GetRainbowApplication();
-
-        rbBubbles = rbApplication.GetBubbles();
-
-        rbContacts = rbApplication.GetContacts();
-        myContact = rbContacts.GetCurrentContact();
-
-        rbConferences = rbApplication.GetConferences();
-        */
-
         ConnectionModel model = ConnectionModel.Instance;
 
         instantMessaging = model.InstantMessaging;
@@ -250,13 +242,32 @@ public class BubbleManager : MonoBehaviour
 
     #region Bubble Creation and Management
 
-    public void CreateBubble(string bubbleName, string bubbleTopic, string visibility = Bubble.BubbleVisibility.AsPrivate)
+
+    public void CreateBubbleHandler()
+    {
+        CreateBubble(bubbleName.text, bubbleSubject?.text);
+
+        bubbleName.text = null;
+        bubbleSubject.text = null;
+
+        createBubblePanel.SetActive(false);
+    }
+
+
+    public void CreateBubble(string bubbleName, string bubbleTopic = "", string visibility = Bubble.BubbleVisibility.AsPrivate)
     {
         rbBubbles.CreateBubble(bubbleName, bubbleTopic, visibility, callback =>
         {
             if (callback.Result.Success)
             {
-                Debug.Log("Bubble created: " + bubbleName);
+                Debug.Log("Bubble created: " + bubbleName); 
+                
+                // Refresh bubble panel to show new bubble after creation
+                UnityMainThreadDispatcher.Instance().Enqueue(() => {
+                    bubblePanel.SetActive(false);
+                    Task.Delay(100);
+                    bubblePanel.SetActive(true);
+                });
             }
             else
             {
