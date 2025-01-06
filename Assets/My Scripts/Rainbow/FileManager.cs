@@ -5,6 +5,8 @@ using Rainbow;
 using Rainbow.Model;
 using Rainbow.Events;
 using Cortex;
+using UnityEditor;
+using TMPro;
 
 
 public class FileManager : MonoBehaviour
@@ -12,7 +14,11 @@ public class FileManager : MonoBehaviour
     private FileStorage fileStorage;
     private InstantMessaging instantMessaging;
     private string fileDescriptorId; // To track file upload progress
-    
+
+    public TMP_Text uploadFilePath;
+    public TMP_Text downloadFilePath;
+
+
 
     public void InitializeFileManager() // Probably will need to assign the variables in the other function bcz they are called too early and not assigned (TO CHECK)
     {
@@ -35,6 +41,24 @@ public class FileManager : MonoBehaviour
             fileStorage.FileDownloadUpdated -= FileDownloadUpdatedHandler;
         }
     }
+
+
+
+    public void OpenUploadFileDialog()
+    {
+        // Open file panel
+        string path = EditorUtility.OpenFilePanel("Choose a File", "", "*");
+
+        // Check if a file was selected
+        if (!string.IsNullOrEmpty(path))
+        {
+            Debug.Log($"File selected: {path}");
+            
+            uploadFilePath.text = "File Selected: " + path;
+        }
+    }
+
+
 
     // Get all received file descriptors
     public void GetAllReceivedFiles()
@@ -146,6 +170,15 @@ public class FileManager : MonoBehaviour
 
     #region How to share/upload a file without to send an IM message and Download file
 
+
+
+    public void UploadFileOnFilesPanel()
+    {
+        //UploadFileWithoutMessage(downloadFilePath);
+    }
+
+
+
     public void UploadFileWithoutMessage(string filePath, Conversation conversation)
     {
         string fileDescriptorId = null;        
@@ -196,6 +229,7 @@ public class FileManager : MonoBehaviour
 
 
     #endregion
+
 
 
 
