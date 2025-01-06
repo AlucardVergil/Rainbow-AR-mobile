@@ -374,6 +374,22 @@ namespace Cortex
             }
         }
 
+
+        public FileStorage FileStorage
+        {
+            get
+            {
+                if (RainbowInterface == null || RainbowInterface.RainbowApplication == null)
+                {
+                    return null;
+                }
+
+                return RainbowInterface.RainbowApplication.GetFileStorage();
+            }
+        }
+
+
+
         // Vagelis end
 
         #endregion // public fields

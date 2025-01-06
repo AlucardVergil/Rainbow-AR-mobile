@@ -966,6 +966,7 @@ namespace Cortex
                     UnityMainThreadDispatcher.Instance().Enqueue(() => {
                         GetComponent<ConversationsManager>().InitializeConversationsAndContacts();
                         GetComponent<BubbleManager>().InitializeBubblesManager();
+                        GetComponent<FileManager>().InitializeFileManager();
                     });
                 }
             });
