@@ -367,7 +367,7 @@ public class ConversationsManager : MonoBehaviour
 
             // Change only the width while keeping the height the same
             Vector2 newSize = rectTransform.sizeDelta;
-            newSize.x = 800; // Set the desired width
+            newSize.x = 480; // Set the desired width
             rectTransform.sizeDelta = newSize;
 
             TMP_Text messageTextComponent = newMessage.GetComponentInChildren<TMP_Text>();
