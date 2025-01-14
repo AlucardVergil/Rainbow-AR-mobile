@@ -185,10 +185,12 @@ public class ConversationsManager : MonoBehaviour
     IEnumerator RefreshIsTypingTextArea()
     {
         isTypingTextArea.gameObject.SetActive(false);
+        GetComponent<BubbleManager>().isTypingTextArea.gameObject.SetActive(false);
 
         yield return new WaitForEndOfFrame();
 
         isTypingTextArea.gameObject.SetActive(true);
+        GetComponent<BubbleManager>().isTypingTextArea.gameObject.SetActive(true);
     }
 
 
@@ -497,6 +499,8 @@ public class ConversationsManager : MonoBehaviour
                 //doOnceRefreshTextArea = true; // Here it works even if it's below. The problem is the retrieval of texts not the sending
 
                 CreateChatMessage(messageInputField.text, true, currentSelectedConversation.PeerId);
+
+                messageInputField.text = "";
             }
             else
             {
@@ -522,7 +526,9 @@ public class ConversationsManager : MonoBehaviour
                 //conversationContentArea.text += $"<align=right>{messageInputField.text}</align>\n\n"; ;
                 //doOnceRefreshTextArea = true; // Here it works even if it's below. The problem is the retrieval of texts not the sending
 
-                CreateChatMessage(messageInputField.text, true, currentSelectedConversation.PeerId);
+                CreateChatMessage(GetComponent<BubbleManager>().messageInputField.text, true, currentSelectedConversation.PeerId);
+
+                GetComponent<BubbleManager>().messageInputField.text = "";
             }
             else
             {
@@ -596,8 +602,11 @@ public class ConversationsManager : MonoBehaviour
                 tempIsTypingTextArea = GetComponent<BubbleManager>().isTypingTextArea;
             }
 
+            // In order to check if the contactJid is mine so that it won't show the is typing for my own messages in bubbles (it only happens in bubbles)
+            Contact myContact = rbContacts.GetCurrentContact();
+
             // Display is typing only if you have the conversation open
-            if (currentSelectedConversation.Id == conversationId)
+            if (currentSelectedConversation.Id == conversationId && myContact.Jid_im != contactJid)
             {
                 // Handle 'is typing' status update
                 if (isTyping)
