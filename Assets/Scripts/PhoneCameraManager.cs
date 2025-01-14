@@ -12,7 +12,8 @@ public class PhoneCameraManager : MonoBehaviour
 
     void Start()
     {
-        debugText.text = "Start:\n";
+        debugText.text = "";
+        //debugText.text = "Start:\n";
         // Check if the device has a camera
         if (WebCamTexture.devices.Length > 0)
         {
@@ -20,11 +21,11 @@ public class PhoneCameraManager : MonoBehaviour
             webCamTexture = new WebCamTexture();
             webCamTexture.deviceName = WebCamTexture.devices[0].name;
 
-            for (int i = 0; i < WebCamTexture.devices.Length; i++)
-            {
-                debugText.text += i + " = " + WebCamTexture.devices[i].name + "\n";
-            }
-
+            //for (int i = 0; i < WebCamTexture.devices.Length; i++)
+            //{
+            //    debugText.text += i + " = " + WebCamTexture.devices[i].name + "\n";
+            //}
+            
 
 
             // Assign the WebCamTexture to a material (e.g., for display on a quad)

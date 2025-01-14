@@ -88,7 +88,7 @@ namespace Cortex
             debugText.text = "";
             foreach (var d in devices)
             {
-                debugText.text += d.name + "\n";
+                //debugText.text += d.name + "\n";
                 if (d.name == name)
                 {
                     RemoveCurrentWebcamTexture();

@@ -44,19 +44,19 @@ public class FileManager : MonoBehaviour
 
 
 
-    public void OpenUploadFileDialog()
-    {
-        // Open file panel
-        string path = EditorUtility.OpenFilePanel("Choose a File", "", "*");
+    //public void OpenUploadFileDialog()
+    //{
+    //    // Open file panel
+    //    string path = EditorUtility.OpenFilePanel("Choose a File", "", "*");
 
-        // Check if a file was selected
-        if (!string.IsNullOrEmpty(path))
-        {
-            Debug.Log($"File selected: {path}");
+    //    // Check if a file was selected
+    //    if (!string.IsNullOrEmpty(path))
+    //    {
+    //        Debug.Log($"File selected: {path}");
             
-            uploadFilePath.text = "File Selected: " + path;
-        }
-    }
+    //        uploadFilePath.text = "File Selected: " + path;
+    //    }
+    //}
 
 
 
